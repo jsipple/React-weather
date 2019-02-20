@@ -4,7 +4,7 @@ class Weather extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            zipcode: "94040",
+            zipcode: "27518",
             country: 'US',
             units: 'imperial',
             // want to grab the weather for the upcoming week
@@ -15,15 +15,17 @@ class Weather extends Component {
     componentDidMount = () => {
       let apiKey = 'f1fa8d030881f674696a9ba2c10ca999'
     //   let url = 'http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID='
-      let queryURL = 'http://api.openweathermap.org/data/2.5/weather?zip=' + this.state.zipcode + "," + this.state.country + "&units=" + this.state.units + "&appid=" + apiKey
+      let queryURL = new Request('http://api.openweathermap.org/data/2.5/weather?zip=' + this.state.zipcode + "," + this.state.country + "&units=" + this.state.units + "&appid=" + apiKey)
+      console.log(queryURL)
       fetch(queryURL)
       .then(res => res.json())
       .then(
         (result) => {
-            // this.setState({
-            //     temp: result.main.temp,
-            //     weather: result.weather[0].main
-            // })
+            this.setState({
+                temp: result.main.temp,
+                weather: result.weather[0].main
+            })
+            // always getting the same result
             console.log(result)
             console.log(this.state)
         },
@@ -43,9 +45,37 @@ class Weather extends Component {
   handleSubmit = (e) => {
       e.preventDefault()
     this.setState({
-        city: this.state.input
+        zipcode: this.state.input
     })
     this.componentDidMount()
+    this.countrySelected()
+    this.unitSelected()
+  }
+  countrySelected = () => {
+      let selects = document.getElementById("countries")
+    //   need to figure out how to get this to run when selected
+    //   let selected = selects[selects.selectedIndex].value
+      let selected = selects.options[selects.selectedIndex].value
+      let code = selected.slice(-2)
+      this.setState({
+          country: code
+      })
+  }
+  unitSelected = () => {
+    let selects = document.getElementById("unit")
+      let selected = selects.options[selects.selectedIndex].value
+      let unit;
+        switch (selected) {
+            case ("F"):
+            unit = "imperial"
+            break;
+            case ("C"):
+            unit = "metric"
+            break;
+      }
+      this.setState({
+          units: unit
+      })
   }
     render() {
         var isoCountries = {
@@ -298,7 +328,8 @@ class Weather extends Component {
             'Zambia': 'ZM',
             'Zimbabwe': 'ZW'
             };
-        let unitsArr = ["F", "C", "K"]
+        let unitsArr = ["F", "C"]
+        // probably want to switch this so I import the array
         let countries = Object.entries(isoCountries)
         const units = unitsArr.map( (x, i) => <option value={x} key={i}>{x}</option>)
         const ccode = countries.map( (x, i) => <option value={x} key={i}>{x.join("-")}</option>)
@@ -306,10 +337,10 @@ class Weather extends Component {
             <Fragment>
                 <form onSubmit={this.handleSubmit}>
                     <input onChange={this.handleChange}/>
-                    <select>
+                    <select id="unit">
                         {units}
                     </select>
-                    <select>
+                    <select id="countries">
                         {ccode}
                     </select>
                     <br />
