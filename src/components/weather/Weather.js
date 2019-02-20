@@ -42,6 +42,10 @@ class Weather extends Component {
         input: e.target.value
     })
   }
+//   this continous pings the server
+//   componentDidUpdate = () => {
+//       this.componentDidMount()
+//   }
   handleSubmit = (e) => {
       e.preventDefault()
     this.setState({
@@ -50,7 +54,9 @@ class Weather extends Component {
     this.countrySelected()
     this.unitSelected()
     // this is running before the state changes
-    this.componentDidMount()
+    // this continuously pings
+    this.componentDidUpdate()
+    // this.componentDidUpdate()
   }
   countrySelected = () => {
       let selects = document.getElementById("countries")
@@ -336,8 +342,9 @@ class Weather extends Component {
         const ccode = countries.map( (x, i) => <option value={x} key={i}>{x.join("-")}</option>)
         return (
             <Fragment>
+                <h1>Weather</h1>
                 <form onSubmit={this.handleSubmit}>
-                    <input onChange={this.handleChange}/>
+                    <input placeholder="Enter your zipcode" onChange={this.handleChange}/>
                     <select id="unit">
                         {units}
                     </select>
