@@ -23,7 +23,7 @@ class Weather extends Component {
         (result) => {
             this.setState({
                 temp: result.main.temp,
-                weather: result.weather[0].main
+                weather: result.weather[0].description
             })
             // always getting the same result
             console.log(result)
@@ -47,9 +47,10 @@ class Weather extends Component {
     this.setState({
         zipcode: this.state.input
     })
-    this.componentDidMount()
     this.countrySelected()
     this.unitSelected()
+    // this is running before the state changes
+    this.componentDidMount()
   }
   countrySelected = () => {
       let selects = document.getElementById("countries")
