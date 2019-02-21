@@ -13,29 +13,34 @@ class Weather extends Component {
         }
     }
     componentDidMount = () => {
-      let apiKey = 'f1fa8d030881f674696a9ba2c10ca999'
-    //   let url = 'http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID='
-      let queryURL = new Request('http://api.openweathermap.org/data/2.5/weather?zip=' + this.state.zipcode + "," + this.state.country + "&units=" + this.state.units + "&appid=" + apiKey)
-      console.log(queryURL)
-      fetch(queryURL)
-      .then(res => res.json())
-      .then(
-        (result) => {
-            this.setState({
-                temp: result.main.temp,
-                weather: result.weather[0].description
-            })
-            // always getting the same result
-            console.log(result)
-            console.log(this.state)
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-            console.log(error)
-        }
-      )
+        this.api()
+  }
+  api =async () => {
+    await this.countrySelected()
+    await this.unitSelected()
+  let apiKey = 'f1fa8d030881f674696a9ba2c10ca999'
+//   let url = 'http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID='
+  let queryURL = new Request('http://api.openweathermap.org/data/2.5/weather?zip=' + this.state.zipcode + "," + this.state.country + "&units=" + this.state.units + "&appid=" + apiKey)
+  console.log(queryURL)
+  fetch(queryURL)
+  .then(res => res.json())
+  .then(
+    (result) => {
+        this.setState({
+            temp: result.main.temp,
+            weather: result.weather[0].description
+        })
+        // always getting the same result
+        console.log(result)
+        console.log(this.state)
+    },
+    // Note: it's important to handle errors here
+    // instead of a catch() block so that we don't swallow
+    // exceptions from actual bugs in components.
+    (error) => {
+        console.log(error)
+    }
+  )
   }
   handleChange = (e) => {
     this.setState({
@@ -50,13 +55,12 @@ class Weather extends Component {
       e.preventDefault()
     this.setState({
         zipcode: this.state.input
-    })
-    this.countrySelected()
+    },
+    this.countrySelected(),
     this.unitSelected()
-    // this is running before the state changes
-    // this continuously pings
-    this.componentDidUpdate()
-    // this.componentDidUpdate()
+    )
+    // call a different component
+    this.api()
   }
   countrySelected = () => {
       let selects = document.getElementById("countries")
@@ -86,6 +90,7 @@ class Weather extends Component {
   }
     render() {
         var isoCountries = {
+            'United States': 'US',
             'Afghanistan': 'AF',
             'Aland Islands': 'AX',
             'Albania': 'AL',
@@ -320,7 +325,6 @@ class Weather extends Component {
             'Ukraine': 'UA',
             'United Arab Emirates': 'AE',
             'United Kingdom': 'GB',
-            'United States': 'US',
             'United States Outlying Islands': 'UM',
             'Uruguay': 'UY',
             'Uzbekistan': 'UZ',
@@ -342,7 +346,7 @@ class Weather extends Component {
         const ccode = countries.map( (x, i) => <option value={x} key={i}>{x.join("-")}</option>)
         return (
             <Fragment>
-                <h1>Weather</h1>
+                <h1>Weather</h1>    
                 <form onSubmit={this.handleSubmit}>
                     <input placeholder="Enter your zipcode" onChange={this.handleChange}/>
                     <select id="unit">
