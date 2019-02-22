@@ -27,7 +27,7 @@ class Weather extends Component {
 // first api call or find out how to grab zip code/country from geolocator
 
   }
-  getLoc = async () => {
+  getLoc = () => {
     var x = document.getElementById("demo");
       function getLocation() {
     if (navigator.geolocation) {
@@ -37,19 +37,17 @@ class Weather extends Component {
       }
     }
     getLocation()
-    //   api call running before this one if i await this says undefined
     // the this needs to be bound to the outside so that i can setState and run next function based on that
-  function showPosition(position) {
+//   above fixed :)
+    function showPosition(position) {
     x.innerHTML = "Latitude: " + position.coords.latitude + 
     "<br>Longitude: " + position.coords.longitude; 
-    lat = position.coords.latitude.toFixed(1)
-    long = position.coords.longitude.toFixed(1)
+    lat = position.coords.latitude
+    long = position.coords.longitude
     that.setState({
         lat: lat,
         long: long
     })
-    console.log(lat)
-    console.log(long)
   }
 }
 // basically just calling whenever long changes not working calling whenever any state changes
