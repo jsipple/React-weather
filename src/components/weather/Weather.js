@@ -1,8 +1,13 @@
 import React, { Component,Fragment } from 'react';
 import {isoCountries} from './countries'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import { faCloudShowersHeavy } from '@fortawesome/free-solid-svg-icons'
+import { library } from '@fortawesome/fontawesome-svg-core'
+library.add(faCloudShowersHeavy)
 let lat;
 let long;
 let that;
+let src;
 class Weather extends Component {
     constructor(props) {
         super(props)
@@ -15,7 +20,8 @@ class Weather extends Component {
             temp: [],
             input: '',
             lat: '',
-            long: ''
+            long: '',
+            weather: ''
         }
         
     }
@@ -56,6 +62,54 @@ componentDidUpdate = (prevProps, prevState) => {
     if (this.state.long !== prevState.long) {
         this.apiByLatLong()
     }
+    // might edit this so that it grabs the time to determine if day or night
+    let icon = document.getElementById("weatherIcon")
+    let query;
+    let regex1 = /50\d{1}/
+    let regex2 = /2\d{2}/
+    let regex3 = /3\d{2}/
+    let regex4 = /6\d{2}/
+    let regex5 = /7\d{2}/
+    let regex6 = /7\d{2}/
+    let regex7 = /51\d{1}/
+    let regex8 = /52\d{1}/
+    let url = "http://openweathermap.org/img/w/"
+    if (this.state.weather !== prevState.weather) {
+      if (regex1.test(this.state.weather)) {
+        query = "10d"
+      }
+      if (regex2.test(this.state.weather)) {
+        query = "11d"
+      }
+      if (regex3.test(this.state.weather)) {
+        query = "9d"
+      }
+      if (regex4.test(this.state.weather)) {
+        query = "13d"
+      }
+      if (regex5.test(this.state.weather)) {
+        query = "50d"
+      }
+      if (regex6.test(this.state.weather)) {
+        if (this.state.weather === 804) {
+          let lastChar = this.state.weather.substr(-1)
+          query = "0" + lastChar + "d"
+        } else {
+          let lastChar = this.state.weather.substr(-1)
+          lastChar = parseInt(lastChar)
+          lastChar++
+          query = "0" + lastChar + "d"
+        }
+      }
+      if (regex7.test(this.state.weather)) {
+        query = "13d"
+      }
+      if (regex8.test(this.state.weather)) {
+        query = "09d"
+      }
+      let queryURL = url + query + ".png"
+      icon.src = queryURL
+    }
 }
   apiByLatLong = async () => {
     let apiKey = 'f1fa8d030881f674696a9ba2c10ca999'
@@ -69,10 +123,10 @@ componentDidUpdate = (prevProps, prevState) => {
     (result) => {
         this.setState({
             temp: result.list[0].main.temp,
-            weather: result.list[0].weather[0].description
+            weather: result.list[0].weather[0].id
         })
         // always getting the same result
-        console.log(result)
+        console.log(result.list[0].weather[0].id)
         console.log(this.state)
     },
     // Note: it's important to handle errors here
@@ -96,7 +150,7 @@ componentDidUpdate = (prevProps, prevState) => {
     (result) => {
         this.setState({
             temp: result.main.temp,
-            weather: result.weather[0].description
+            weather: result.list[0].weather[0].id
         })
         // always getting the same result
         console.log(result)
@@ -155,6 +209,7 @@ componentDidUpdate = (prevProps, prevState) => {
       this.setState({
           units: unit
       })
+      console.log(this.state)
   }
     render() {
         let unitsArr = ["F", "C"]
@@ -167,12 +222,14 @@ componentDidUpdate = (prevProps, prevState) => {
                 <h1>Weather</h1>    
                 <form onSubmit={this.handleSubmit}>
                     <input placeholder="Enter your zipcode" onChange={this.handleChange}/>
-                    <select id="unit">
+                    <select id="unit" onChange={this.unitSelected}>
                         {units}
                     </select>
                     <select id="countries">
                         {ccode}
                     </select>
+                    <br />
+                    <img id="weatherIcon" src={src}/>
                     <br />
                     {this.state.temp}
                     <br />
